@@ -115,6 +115,7 @@ To achieve this setup the module user needs to configure Hiera in _/etc/puppet/h
 
 :puppet:
 	:datasource: data
+	:nodefault: __nodefault__
 </pre>
 
 Converting from extlookup?
