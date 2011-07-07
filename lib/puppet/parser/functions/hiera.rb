@@ -27,6 +27,7 @@ module Puppet::Parser::Functions
 
         config = YAML.load_file(configfile)
         config[:logger] = "puppet"
+        default = nil if default == config[:puppet][:nodefault] unless config[:puppet][:nodefault].nil?
 
         hiera = Hiera.new(:config => config)
 
