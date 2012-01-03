@@ -1,10 +1,16 @@
 require 'rubygems'
 require 'rubygems/package_task'
 require 'rspec/core/rake_task'
+require 'tasks/release.rb'
+
+class GemVersion
+  VERSION = "0.2.0"
+end
 
 spec = Gem::Specification.new do |s|
   s.name = "hiera-puppet"
-  s.version = "0.2.0"
+  # Tag the version you want to release via an annotated tag
+  s.version = described_version
   s.author = "R.I.Pienaar"
   s.email = "rip@devco.net"
   s.homepage = "https://github.com/ripienaar/hiera-puppet"
