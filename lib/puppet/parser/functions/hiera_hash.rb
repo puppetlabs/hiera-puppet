@@ -16,16 +16,13 @@ module Puppet::Parser::Functions
         require 'hiera'
         require 'hiera/scope'
 
-        config = YAML.load_file(configfile)
-        config[:logger] = "puppet"
-
-        hiera = Hiera.new(:config => config)
-
         if self.respond_to?("{}")
             hiera_scope = self
         else
             hiera_scope = Hiera::Scope.new(self)
         end
+
+        hiera = Hiera.new({:logger => 'puppet', :config => configfile}, hiera_scope)
 
         answer = hiera.lookup(key, default, hiera_scope, override, :hash)
 
