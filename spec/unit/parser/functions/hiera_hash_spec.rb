@@ -18,9 +18,6 @@ describe 'Puppet::Parser::Functions' do
         #Hiera::Config.stubs("load").returns({:backends => ["yaml"], :hierarchy => "common", :logger => "console"})
         Puppet::Parser::Functions.function(:hiera_hash)
       end
-      it 'should require a key argument' do
-        expect { @scope.function_hiera_hash([]) }.should raise_error(Puppet::ParseError)
-      end
       it 'should optionally take a default hash value' do
         @scope.function_hiera_hash(['key', {'key' => 'default'}]).should == { 'key' => 'default' }
       end
@@ -38,5 +35,13 @@ describe 'Puppet::Parser::Functions' do
       it 'should not return nil result'
       it 'should not return nil default'
     end
+  end
+end
+
+describe 'Puppet::Parser::Functions#hiera_hash argument error' do
+  it 'should require a key argument' do
+    Puppet::Parser::Functions.function(:hiera_hash)
+    @scope = Puppet::Parser::Scope.new
+    expect { @scope.function_hiera_hash([]) }.should raise_error(Puppet::ParseError)
   end
 end
