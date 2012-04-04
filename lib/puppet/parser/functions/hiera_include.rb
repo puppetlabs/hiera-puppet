@@ -8,7 +8,14 @@ module Puppet::Parser::Functions
         default = args[1]
         override = args[2]
 
-        configfile = File.join([File.dirname(Puppet.settings[:config]), "hiera.yaml"])
+        # Check if hiera_configfile is set via a global puppet variable
+        global_var_configdir = File.join(lookupvar("hiera_configdir"))
+        if global_var_configdir != ""
+          configfile = File.expand_path(File.join(global_var_configdir, "hiera.yaml"))
+          Puppet.warning("Overriding Hiera Config Directory to #{configfile}")
+        else
+          configfile = File.join([File.dirname(Puppet.settings[:config]), "hiera.yaml"])
+        end
 
         raise(Puppet::ParseError, "Hiera config file #{configfile} not readable") unless File.exist?(configfile)
         raise(Puppet::ParseError, "You need rubygems to use Hiera") unless Puppet.features.rubygems?
@@ -36,6 +43,13 @@ module Puppet::Parser::Functions
 
         config = YAML.load_file(configfile)
         config[:logger] = "puppet"
+
+        # Add yaml dataconfiguration dir to the configuration
+        global_var_yaml_datadir = File.join(lookupvar("hiera_yaml_datadir"))
+        if global_var_yaml_datadir !=""
+          config[:yaml] = Hash.new if config[:yaml].nil?
+          config[:yaml][:datadir] = global_var_yaml_datadir
+        end
 
         hiera = Hiera.new(:config => config)
 
