@@ -15,8 +15,26 @@ module Puppet::Parser::Functions
         raise(Puppet::ParseError, "Hiera config file #{configfile} not readable") unless File.exist?(configfile)
         raise(Puppet::ParseError, "You need rubygems to use Hiera") unless Puppet.features.rubygems?
 
-        require 'hiera'
-        require 'hiera/scope'
+       begin
+         # Try normal gem loading
+         require 'hiera'
+         require 'hiera/scope'
+       rescue LoadError
+         # If this fails revert to the gem inside this module
+         hiera_gem_path = File.expand_path(File.join(File.dirname(__FILE__),'..','..','..','hiera-gem','lib'))
+         Puppet.warning("Loading hiera gem from inside the hiera-puppet module")
+
+         # Add the load path for loading hiera.rb
+         $LOAD_PATH.unshift(hiera_gem_path) unless $LOAD_PATH.include?(hiera_gem_path)
+         require 'hiera'
+         Puppet.debug("Hiera Gem Path added: #{hiera_gem_path}")
+
+         # Add the load path for loading hiera/scope.rb
+         hiera_scope_gem_path = File.expand_path(File.join(File.dirname(__FILE__),'..','..','..'))
+         $LOAD_PATH.unshift(hiera_scope_gem_path) unless $LOAD_PATH.include?(hiera_scope_gem_path)
+         require 'hiera/scope'
+         Puppet.debug("Hiera Scope Gem Path added: #{hiera_scope_gem_path}")
+       end
 
         config = YAML.load_file(configfile)
         config[:logger] = "puppet"
