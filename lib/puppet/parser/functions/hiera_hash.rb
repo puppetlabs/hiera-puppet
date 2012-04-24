@@ -12,13 +12,18 @@ module Puppet::Parser::Functions
 
         configfile = File.join([File.dirname(Puppet.settings[:config]), "hiera.yaml"])
 
-        raise(Puppet::ParseError, "Hiera config file #{configfile} not readable") unless File.exist?(configfile)
         raise(Puppet::ParseError, "You need rubygems to use Hiera") unless Puppet.features.rubygems?
 
         require 'hiera'
         require 'hiera/scope'
 
-        config = YAML.load_file(configfile)
+        begin
+            config = YAML.load_file(configfile)
+        rescue
+            Puppet.warning "Hiera config file #{configfile} not readable"
+            config = {}
+        end
+
         config[:logger] = "puppet"
 
         hiera = Hiera.new(:config => config)
