@@ -10,7 +10,8 @@ module Puppet::Parser::Functions
         default = args[1]
         override = args[2]
 
-        configfile = File.join([File.dirname(Puppet.settings[:config]), "hiera.yaml"])
+        configfile = Puppet.settings[:hiera_config]
+        configfile = File.join([File.dirname(Puppet.settings[:config]), "hiera.yaml"]) if configfile.nil?
 
         raise(Puppet::ParseError, "Hiera config file #{configfile} not readable") unless File.exist?(configfile)
 
