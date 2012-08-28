@@ -1,6 +1,7 @@
 require 'rubygems'
 require 'rubygems/package_task'
 require 'rspec/core/rake_task'
+require 'puppet-lint/tasks/puppet-lint'
 
 Dir['tasks/**/*.rake'].each { |t| load t }
 
